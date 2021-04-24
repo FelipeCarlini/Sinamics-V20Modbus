@@ -1,2 +1,2 @@
 # Sinamics-V20Modbus
-Sinamics-V20 Modbus drive controlled by the esp8266 microcontroller
+Sinamics-V20 drive modbus controlled by esp8266 board
