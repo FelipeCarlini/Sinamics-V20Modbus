@@ -1,6 +1,49 @@
 //Programa: Display LCD Touch TFT 3.5"
 //Autor: Felipe Carlini
 
+#include <MCUFRIEND_kbv.h>
+#include <Adafruit_GFX.h>
+#include <TouchScreen.h>
+#include <EEPROM.h>
+
+#define YP A3 // Y+ is on Analog1
+#define XM A2 // X- is on Analog2
+#define YM 9 // Y- is on Digital7
+#define XP 8 // X+ is on Digital6
+
+#define TS_MINX 118
+#define TS_MINY 92
+#define TS_MAXX 906
+#define TS_MAXY 951
+
+#define LCD_RESET A4
+#define LCD_CS A3
+#define LCD_CD A2
+#define LCD_WR A1
+#define LCD_RD A0
+
+#define BLACK   0x0000
+#define BLUE   0x0808
+#define RED     0xF800
+#define GREEN   0x8FFF
+#define CYAN    0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW  0xFFE0
+#define WHITE   0xFFFF
+
+#define MINPRESSURE 5
+#define MAXPRESSURE 5000
+
+#define SelectionMenu 0
+#define ConfigTimeMenu 1
+#define ConfigSpeedMenu 2
+
+#define SUBTRACT 0
+#define ADD 1
+
+TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
+MCUFRIEND_kbv tft;
+
 class ButtonClass {
   public:
     int btnNumber;
@@ -31,64 +74,20 @@ ButtonClass PercentageTenValues[2]; // 10% operations
 ButtonClass MinuteValues[2];
 ButtonClass SecondValues[2];
 
-
-#include <MCUFRIEND_kbv.h>
-#include <Adafruit_GFX.h>
-#include <TouchScreen.h>
-#include <EEPROM.h>
-
-#define YP A3 // Y+ is on Analog1
-#define XM A2 // X- is on Analog2
-#define YM 9 // Y- is on Digital7
-#define XP 8 // X+ is on Digital6
-
-#define TS_MINX 118
-#define TS_MINY 92
-#define TS_MAXX 906
-#define TS_MAXY 951
-
-TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
-
-#define LCD_RESET A4
-#define LCD_CS A3
-#define LCD_CD A2
-#define LCD_WR A1
-#define LCD_RD A0
-
-#define BLACK   0x0000
-#define BLUE    0x001F
-#define RED     0xF800
-#define GREEN   0x07E0
-#define CYAN    0x07FF
-#define MAGENTA 0xF81F
-#define YELLOW  0xFFE0
-#define WHITE   0xFFFF
-
-MCUFRIEND_kbv tft;
-
-#define MINPRESSURE 5
-#define MAXPRESSURE 5000
-
-#define SelectionMenu 0
-#define ConfigTimeMenu 1
-#define ConfigSpeedMenu 2
-
-#define SUBTRACT 0
-#define ADD 1
-
 short int menu=0;
 
 // function prototypes
 void initializeButtons(ButtonClass ButtonArray[], int y_offset, char text_header, int offsetBtnStringX, int offsetBtnStringY, short int btnQty, short int separation, short int Height, bool render);
 void initializeValuesButtons(ButtonClass ButtonArray[], short int x_offset, short int y_offset, short int Width=75, short int Height=60);
 void renderButtontext(ButtonClass button, short int color, short int textSize);
-void renderText(int x0,short int y0, short int color, short int textSize, String text);
+void renderText(int x0,short int y0, short int color, short int textSize, String text, int bg_color=BLACK);
+void renderSelectedValues(int color, short int textSize, short int x0, short int y0, int bg_color=BLACK);
 void onSelectSelectionButton(ButtonClass ButtonArray[], int touchedBtn);
-void renderSelectedValues(int color, short int textSize, short int x0, short int y0);
 void renderConfig(short int configBtn);
 void renderButton(ButtonClass Button, int color, short int textSize=2);
 void renderBtnArray(ButtonClass ButtonArray[], int btnQty, short int textSize=2);
 void changeValueSelectedButton(ButtonClass ButtonArray[], int value);
+void runRoutine(ButtonClass* SubmitBtn, int speed, int time);
 void setupEEPROM();
 void cleanEEPROM();
 void renderConfigTime();
@@ -182,7 +181,7 @@ void loop() {
 
   if (p.z > MINPRESSURE && p.z < MAXPRESSURE) {
     int xVlue, yVlue, timeButton, speedButton, configButton;
-    short int minuteButton, secondButton, percentageButton, percentageTenButton;
+    short int minuteButton, secondButton, percentageButton, percentageTenButton, startWork;
     xVlue = (abs(map(p.y, TS_MINY, TS_MAXY, tft.width(), 0)));
     yVlue = (abs(map(p.x, TS_MINX, TS_MAXX, tft.height(), 0)));
 
@@ -201,6 +200,13 @@ void loop() {
       if(configButton != -1) {
         menu = configButton + 1;
         renderConfig(configButton); // 0: Times 1: Speeds
+      }
+      if(checkButtonTouched(&SubmitBtn, 1, xVlue, yVlue) != -1){
+        int speed = getSelectedButton(SpeedArray, 4);
+        int time = getSelectedButton(TimeArray, 4);
+        speed = getBtnValue(SpeedArray[speed]);
+        time = getBtnValue(TimeArray[time]);
+        runRoutine(&SubmitBtn, speed, time); 
       }
     }else if(menu != SelectionMenu) {
       if(checkButtonTouched(&SelectionBtn, 1, xVlue, yVlue) != -1){
@@ -372,8 +378,8 @@ void renderButtontext(ButtonClass button, short int color, short int textSize) {
     tft.println(button.btnText);
 }
 
-void renderText(int x0,short int y0, short int color, short int textSize, String text) {
-    tft.setTextColor(color, BLACK);
+void renderText(int x0,short int y0, short int color, short int textSize, String text, int bg_color=BLACK) {
+    tft.setTextColor(color, bg_color);
     tft.setTextSize(textSize);
     tft.setCursor(x0, y0);
     tft.println(text);
@@ -392,7 +398,7 @@ void onSelectSelectionButton(ButtonClass ButtonArray[], int touchedBtn) {
   }
 }
 
-void renderSelectedValues(int color, short int textSize, short int x0, short int y0) {
+void renderSelectedValues(int color, short int textSize, short int x0, short int y0, int bg_color=BLACK) {
   // Selected BTN
   int selectedSpeed = getSelectedButton(SpeedArray, 4);
   int selectedTime = getSelectedButton(TimeArray, 4);
@@ -405,7 +411,7 @@ void renderSelectedValues(int color, short int textSize, short int x0, short int
   for(int i=0; i<(17 - textLen); i++) {
     textDisplay = " " + textDisplay;
   }
-  renderText(x0, y0, color, 2, textDisplay);
+  renderText(x0, y0, color, 2, textDisplay, bg_color);
 }
 
 int getSelectedButton(ButtonClass ButtonArray[], short int btnQty) {
@@ -510,4 +516,33 @@ void changeValueSelectedButton(ButtonClass ButtonArray[], int value) {
     EEPROM.write(ButtonArray[selectedButton].EEPROMAddress, firstAddressValue);
     EEPROM.write(ButtonArray[selectedButton].EEPROMAddressTwo, secondAddressValue);
   }
+}
+
+void runRoutine(ButtonClass* SubmitBtn, int speed, int time) {
+    int bg_color = 47200;
+    int display_time = time;
+    String runText = "Puliendo";
+    tft.fillRoundRect(SubmitBtn->x0, SubmitBtn->y0, SubmitBtn->Width, SubmitBtn->Height, 5, bg_color);
+    tft.drawRoundRect(SubmitBtn->x0, SubmitBtn->y0, SubmitBtn->Width, SubmitBtn->Height, 5, WHITE);
+    tft.setTextColor(WHITE);
+    tft.setTextSize(2);
+    tft.setCursor(SubmitBtn->x0string, SubmitBtn->y0string);
+    tft.println(runText);
+    unsigned long initial_time=millis();
+    unsigned long render_time = 0;
+    int run_time = 0;
+    while(millis() < initial_time+time*1000){
+        if(millis() > render_time + 300){
+            render_time = millis();
+            run_time = ((initial_time + time*1000) - millis()) / 1000;
+            String textDisplay = "T: " + formatTime(run_time) + " V: " + String(speed) + "%";
+            short int textLen = textDisplay.length();
+            for(int i=0; i<(17 - textLen); i++) {
+                textDisplay = " " + textDisplay;
+            }
+            renderText(240, SubmitBtn->y0string, WHITE, 2, textDisplay, bg_color);
+        }
+    }
+    renderButton(*SubmitBtn, BLACK);
+    renderSelectedValues(WHITE, 2, 240, SubmitBtn->y0string, BLACK);
 }
