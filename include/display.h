@@ -1,4 +1,4 @@
-#include <User_Setup.h>
+#include <ILI9486_DRIVER.h>
 
 #define TS_EEPROM_SP 50 // touch screen EEPROM start position
 #define XP TFT_D0
