@@ -231,6 +231,7 @@ void cleanEEPROM()
             EEPROM.write(TimeArray[i].EEPROMAddressTwo, 0);
         }
     }
+    EEPROM.commit();
 }
 
 void renderSelection()
@@ -502,6 +503,7 @@ void changeValueSelectedButton(ButtonClass ButtonArray[], int value)
         EEPROM.write(ButtonArray[selectedButton].EEPROMAddress, firstAddressValue);
         EEPROM.write(ButtonArray[selectedButton].EEPROMAddressTwo, secondAddressValue);
     }
+    EEPROM.commit();
 }
 
 void runRoutine(ButtonClass *SubmitBtn, int speed, int time)
