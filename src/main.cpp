@@ -2,19 +2,13 @@
 #include <ILI9486_DRIVER.h>
 #include <TFT_eSPI.h>
 #include <display.h>
-
-
-int xMax, xMin, maxMinInit=0;
+#include <user_interface.h>
 
 void setup() {
   setupDisplay();
+  setupUI();
 }
 
 void loop() {
-  updateTsRaw();
-  if(touchGetZ() > 75) {
-    clearScreen();
-    println(String(touchGetX()) + "        ");
-    println(String(touchGetY()) + "        ");
-  }
+  runUI();
 }

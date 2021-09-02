@@ -1,7 +1,6 @@
 #include <Arduino.h>
-#include <SPI.h>
-#include <TFT_eSPI.h>
 #include <TouchScreen.h>
+#include <user_interface.h>
 #include <display.h>
 #include <EEPROM.h>
 #include <stdint.h>
@@ -13,7 +12,6 @@
 
 #define EEPROM_SIZE 100
 
-TFT_eSPI tft = TFT_eSPI();
 TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
 TSPoint p;
 
@@ -21,7 +19,6 @@ typedef union {
     int16_t value;
     char byte[2];
 } eeprom_u;
-
 
 void setupTouchScreen();
 void setupLCD();
@@ -41,16 +38,7 @@ int16_t calibrate_max_y;
 void setupDisplay()
 {
     EEPROM.begin(EEPROM_SIZE);
-    setupLCD();
     setupTouchScreen();
-}
-
-// LCD
-void setupLCD()
-{
-    tft.init();
-    tft.setRotation(1);
-    tft.fillScreen(0);
 }
 
 // Touch
@@ -73,20 +61,10 @@ void updateTsRaw()
     digitalWrite(XP, HIGH);
 }
 
-void println(String str) {
-    tft.println(str);
-}
-void clearScreen() {
-    tft.setCursor(0, 0, 2);
-    tft.setTextColor(TFT_WHITE,TFT_BLACK);
-    tft.setTextSize(2);
-}
-
 void calibrate()
 {
     if (shouldCalibrate()) {
-        tft.setTextSize(2);
-        tft.println(" Presionar todo el contorno del display\n Luego reiniciar");
+        renderText(100, 100, 1, 3, " Presionar todo el contorno del display\n Luego reiniciar");
         int16_t x_min, x_max, y_min, y_max;
         bool calibrate_started=false;
         while (true) {
@@ -94,7 +72,7 @@ void calibrate()
             int x_vlue = p.y;
             int y_vlue = p.x;
             bool change_calibrate_vlues = false;
-            if (touchGetZ() >= 75) {
+            if (touchGetZ() >= MINPRESSURE) {
                 if (!calibrate_started) {
                     x_min = x_vlue;
                     x_max = x_vlue;
@@ -186,12 +164,12 @@ int16_t readIntEEPROM(unsigned int pos) {
 
 int touchGetX()
 {
-    return map(p.y, calibrate_min_x, calibrate_max_x, 0, tft.width());
+    return tftWidth() - map(p.y, calibrate_min_x, calibrate_max_x, 0, tftWidth());
 }
 
 int touchGetY()
 {
-    return map(p.x, calibrate_min_y, calibrate_max_y, 0, tft.height());
+    return tftHeight() - map(p.x, calibrate_min_y, calibrate_max_y, 0, tftHeight());
 }
 
 int touchGetZ()
