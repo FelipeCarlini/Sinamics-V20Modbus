@@ -42,7 +42,7 @@ void setupUI()
     tft.init();
     tft.setRotation(1);
     tft.fillScreen(BLACK);
-    
+
     ConfigArray[0].btnText = "Tiempos";
     ConfigArray[1].btnText = "Velocidades";
     SubmitBtn.btnText = "Iniciar";
@@ -217,7 +217,7 @@ void cleanEEPROM()
     // sets EEPROM 0x00 for ilegal values
     for (short int i = 0; i < 4; i++)
     {
-        if (EEPROM.read(SpeedArray[i].EEPROMAddress) > 255)
+        if (EEPROM.read(SpeedArray[i].EEPROMAddress) > 100)
         {
             EEPROM.write(SpeedArray[i].EEPROMAddress, 0);
         }
