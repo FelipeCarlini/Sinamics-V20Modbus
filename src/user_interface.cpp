@@ -40,6 +40,9 @@ short int menu = 0;
 void setupUI()
 {
     tft.init();
+    tft.setRotation(1);
+    tft.fillScreen(BLACK);
+    
     ConfigArray[0].btnText = "Tiempos";
     ConfigArray[1].btnText = "Velocidades";
     SubmitBtn.btnText = "Iniciar";
