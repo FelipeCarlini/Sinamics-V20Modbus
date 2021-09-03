@@ -110,7 +110,10 @@ void runUI()
                 int time = getSelectedButton(TimeArray, 4);
                 speed = getBtnValue(SpeedArray[speed]);
                 time = getBtnValue(TimeArray[time]);
-                runRoutine(&SubmitBtn, speed, time);
+                if (time > 0)
+                {
+                    runRoutine(&SubmitBtn, speed, time);
+                }
             }
         }
         else if (menu != SelectionMenu)
@@ -518,11 +521,12 @@ void runRoutine(ButtonClass *SubmitBtn, int speed, int time)
     tft.setCursor(SubmitBtn->x0string, SubmitBtn->y0string);
     tft.println(runText);
     unsigned long initial_time = millis();
+    const int init_stop_delay_ms = 1000, render_delay_ms = 300;
     unsigned long render_time = 0;
     int run_time = 0;
     while (millis() < initial_time + time * 1000)
     {
-        if (millis() > render_time + 300)
+        if (millis() > render_time + render_delay_ms)
         {
             render_time = millis();
             run_time = ((initial_time + time * 1000) - millis()) / 1000;
@@ -534,15 +538,29 @@ void runRoutine(ButtonClass *SubmitBtn, int speed, int time)
             }
             renderText(240, SubmitBtn->y0string, WHITE, 2, textDisplay, bg_color);
         }
+        if (millis() > initial_time + init_stop_delay_ms)
+        {
+            updateTsRaw();
+            if (touchGetZ() >= MINPRESSURE)
+            {
+                if (checkButtonTouched(SubmitBtn, 1, touchGetX(), touchGetY()) != -1)
+                {
+                    break;
+                }
+            }
+        }
     }
     renderButton(*SubmitBtn, BLACK);
     renderSelectedValues(WHITE, 2, 240, SubmitBtn->y0string, BLACK);
+    delay(300);
 }
 
-int tftWidth() {
+int tftWidth()
+{
     return tft.width();
 }
 
-int tftHeight() {
+int tftHeight()
+{
     return tft.height();
 }
