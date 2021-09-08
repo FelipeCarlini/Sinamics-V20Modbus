@@ -44,7 +44,9 @@ void setupDisplay()
 // Touch
 void setupTouchScreen()
 {
-    calibrate();
+    if (shouldCalibrate()) {
+        calibrate();
+    }
     setCalibrationVlues();
 }
 
@@ -63,7 +65,6 @@ void updateTsRaw()
 
 void calibrate()
 {
-    if (shouldCalibrate()) {
         renderText(100, 100, 1, 3, " Presionar todo el contorno del display\n Luego reiniciar");
         int16_t x_min, x_max, y_min, y_max;
         bool calibrate_started=false;
@@ -102,7 +103,7 @@ void calibrate()
                  }
             }
         }
-    }
+    
 }
 
 void writeCalibrateVluesEEPROM(int16_t x_min, int16_t x_max, int16_t y_min, int16_t y_max)

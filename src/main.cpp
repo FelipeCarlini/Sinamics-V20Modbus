@@ -3,10 +3,12 @@
 #include <TFT_eSPI.h>
 #include <display.h>
 #include <user_interface.h>
+#include <buttons.h>
 
 void setup() {
-  setupDisplay();
   setupUI();
+  setupDisplay();
+  setupHardwareButtons();
 }
 
 void loop() {

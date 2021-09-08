@@ -4,6 +4,7 @@
 #include <SPI.h>
 #include <TFT_eSPI.h>
 #include <EEPROM.h>
+#include <buttons.h>
 
 #define SelectionMenu 0
 #define ConfigTimeMenu 1
@@ -197,6 +198,20 @@ void runUI()
             }
         }
     }
+    if (shouldStart())
+    {
+        int speed = getSelectedButton(SpeedArray, 4);
+        int time = getSelectedButton(TimeArray, 4);
+        speed = getBtnValue(SpeedArray[speed]);
+        time = getBtnValue(TimeArray[time]);
+        if (time > 0)
+        {
+            runRoutine(&SubmitBtn, speed, time);
+        }
+    }
+    if(shouldStop()){
+        //pass
+    }
 }
 
 void setupEEPROM()
@@ -387,6 +402,7 @@ int getSelectedButton(ButtonClass ButtonArray[], short int btnQty)
             return i;
         }
     }
+    return -1;
 }
 
 String formatTime(int seconds)
@@ -512,7 +528,6 @@ void changeValueSelectedButton(ButtonClass ButtonArray[], int value)
 void runRoutine(ButtonClass *SubmitBtn, int speed, int time)
 {
     int bg_color = 47200;
-    int display_time = time;
     String runText = "Puliendo";
     tft.fillRoundRect(SubmitBtn->x0, SubmitBtn->y0, SubmitBtn->Width, SubmitBtn->Height, 5, bg_color);
     tft.drawRoundRect(SubmitBtn->x0, SubmitBtn->y0, SubmitBtn->Width, SubmitBtn->Height, 5, WHITE);
@@ -547,6 +562,10 @@ void runRoutine(ButtonClass *SubmitBtn, int speed, int time)
                 {
                     break;
                 }
+            }
+            else if (shouldStop())
+            {
+                break;
             }
         }
     }

@@ -9,6 +9,8 @@
 
 void setupDisplay();
 void updateTsRaw();
+void calibrate();
+
 int touchGetX();
 int touchGetY();
 int touchGetZ();
