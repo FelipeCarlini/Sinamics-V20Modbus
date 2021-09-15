@@ -4042,6 +4042,7 @@ type V526-0, grid 2.5 mm</description>
 <part name="R1" library="BeagleBone_Black_Wireless" library_urn="urn:adsk.eagle:library:6644236" deviceset="R-US_" device="0204/7" package3d_urn="urn:adsk.eagle:package:8118465/1"/>
 <part name="R2" library="BeagleBone_Black_Wireless" library_urn="urn:adsk.eagle:library:6644236" deviceset="R-US_" device="0204/7" package3d_urn="urn:adsk.eagle:package:8118465/1"/>
 <part name="R3" library="BeagleBone_Black_Wireless" library_urn="urn:adsk.eagle:library:6644236" deviceset="R-US_" device="0204/7" package3d_urn="urn:adsk.eagle:package:8118465/1"/>
+<part name="X4" library="con-ptr500" library_urn="urn:adsk.eagle:library:181" deviceset="AK500/2-H" device="" package3d_urn="urn:adsk.eagle:package:9901/1"/>
 </parts>
 <sheets>
 <sheet>
@@ -4117,6 +4118,13 @@ type V526-0, grid 2.5 mm</description>
 <attribute name="NAME" x="140.97" y="87.4014" size="1.778" layer="95" rot="R180"/>
 <attribute name="VALUE" x="140.97" y="92.202" size="1.778" layer="96" rot="R180"/>
 </instance>
+<instance part="X4" gate="-1" x="132.08" y="58.42" smashed="yes" rot="R180">
+<attribute name="NAME" x="133.35" y="57.531" size="1.778" layer="95"/>
+</instance>
+<instance part="X4" gate="-2" x="132.08" y="63.5" smashed="yes" rot="R180">
+<attribute name="NAME" x="133.35" y="62.611" size="1.778" layer="95"/>
+<attribute name="VALUE" x="135.89" y="67.183" size="1.778" layer="96" rot="R180"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -4152,6 +4160,11 @@ type V526-0, grid 2.5 mm</description>
 <wire x1="17.78" y1="83.82" x2="15.24" y2="83.82" width="0.1524" layer="91"/>
 <label x="15.24" y="83.82" size="1.27" layer="95" rot="R180" xref="yes"/>
 </segment>
+<segment>
+<pinref part="X4" gate="-1" pin="KL"/>
+<wire x1="127" y1="58.42" x2="124.46" y2="58.42" width="0.1524" layer="91"/>
+<label x="124.46" y="58.42" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
 </net>
 <net name="3V3" class="0">
 <segment>
@@ -4180,6 +4193,11 @@ type V526-0, grid 2.5 mm</description>
 <pinref part="U$2" gate="G$1" pin="VCC"/>
 <wire x1="17.78" y1="76.2" x2="15.24" y2="76.2" width="0.1524" layer="91"/>
 <label x="15.24" y="76.2" size="1.27" layer="95" rot="R180" xref="yes"/>
+</segment>
+<segment>
+<pinref part="X4" gate="-2" pin="KL"/>
+<wire x1="127" y1="63.5" x2="124.46" y2="63.5" width="0.1524" layer="91"/>
+<label x="124.46" y="63.5" size="1.27" layer="95" rot="R180" xref="yes"/>
 </segment>
 </net>
 <net name="LCD_D7" class="0">
@@ -4486,10 +4504,19 @@ type V526-0, grid 2.5 mm</description>
 </sheet>
 </sheets>
 <errors>
+<approved hash="101,1,149.86,7.62,S12,P,,,,"/>
+<approved hash="101,1,160.02,7.62,S12,S,,,,"/>
 <approved hash="113,1,22.6339,48.4971,JP3,,,,,"/>
 <approved hash="113,1,48.0339,48.4971,JP4,,,,,"/>
 <approved hash="113,1,20.0939,20.5571,JP5,,,,,"/>
 <approved hash="113,1,40.4139,20.5571,JP6,,,,,"/>
+<approved hash="113,1,148.401,35.56,X1,,,,,"/>
+<approved hash="113,1,148.401,50.8,X2,,,,,"/>
+<approved hash="113,1,104.075,71.374,X3,,,,,"/>
+<approved hash="113,1,132.08,80.1903,R1,,,,,"/>
+<approved hash="113,1,147.32,80.1903,R2,,,,,"/>
+<approved hash="113,1,137.16,87.8103,R3,,,,,"/>
+<approved hash="113,1,130.999,58.42,X4,,,,,"/>
 </errors>
 </schematic>
 </drawing>
