@@ -4506,10 +4506,12 @@ type V526-0, grid 2.5 mm</description>
 <errors>
 <approved hash="101,1,149.86,7.62,S12,P,,,,"/>
 <approved hash="101,1,160.02,7.62,S12,S,,,,"/>
-<approved hash="113,1,22.6339,48.4971,JP3,,,,,"/>
-<approved hash="113,1,48.0339,48.4971,JP4,,,,,"/>
-<approved hash="113,1,20.0939,20.5571,JP5,,,,,"/>
-<approved hash="113,1,40.4139,20.5571,JP6,,,,,"/>
+<approved hash="104,1,17.78,76.2,U$2,VCC,+5V,,,"/>
+<approved hash="108,1,63.5,80.01,DE,,,,,"/>
+<approved hash="113,1,22.6644,48.4971,JP3,,,,,"/>
+<approved hash="113,1,48.0644,48.4971,JP4,,,,,"/>
+<approved hash="113,1,20.1244,20.5571,JP5,,,,,"/>
+<approved hash="113,1,40.4444,20.5571,JP6,,,,,"/>
 <approved hash="113,1,148.401,35.56,X1,,,,,"/>
 <approved hash="113,1,148.401,50.8,X2,,,,,"/>
 <approved hash="113,1,104.075,71.374,X3,,,,,"/>
