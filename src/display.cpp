@@ -10,9 +10,7 @@
 #define TS_MAXX 906
 #define TS_MAXY 951
 
-#define EEPROM_SIZE 100
-
-TouchScreen ts = TouchScreen(XP, YP, XM, YM, 300);
+TouchScreen ts = TouchScreen(XP, YP, XM, YM, 264);
 TSPoint p;
 
 typedef union
@@ -27,8 +25,8 @@ void calibrate();
 void writeCalibrateVluesEEPROM(int16_t x_min, int16_t x_max, int16_t y_min, int16_t y_max);
 void writeIntEEPROM(unsigned int pos, int16_t value);
 void writeEEPROM(unsigned int pos, char value);
-void setCalibrationVlues();
 bool shouldCalibrate();
+
 int16_t readIntEEPROM(unsigned int pos);
 
 int16_t calibrate_min_x;
@@ -67,17 +65,22 @@ void updateTsRaw()
 
 void calibrate()
 {
-    renderText(100, 100, 1, 3, " Presionar todo el contorno del display\n Luego reiniciar");
+    fillScreen(BLACK);
+    renderText(30, 50, WHITE, 2, "Presionar todo el contorno del display", BLACK);
+    renderText(30, 75, WHITE, 2, "Luego Reiniciar", BLACK);
     int16_t x_min, x_max, y_min, y_max;
     bool calibrate_started = false;
     while (true)
     {
         updateTsRaw();
-        int x_vlue = p.y;
-        int y_vlue = p.x;
+        int y_vlue = p.y;
+        int x_vlue = p.x;
         bool change_calibrate_vlues = false;
         if (touchGetZ() >= MINPRESSURE)
         {
+            renderText(30, 150, WHITE, 2, "X:" + String(x_vlue) + "    ", BLACK);
+            renderText(30, 175, WHITE, 2, "Y:" + String(y_vlue) + "    ", BLACK);
+            renderText(30, 200, WHITE, 2, "Z:" + String(touchGetZ()) + "    ", BLACK);
             if (!calibrate_started)
             {
                 x_min = x_vlue;
@@ -180,12 +183,12 @@ int16_t readIntEEPROM(unsigned int pos)
 
 int touchGetX()
 {
-    return tftWidth() - map(p.y, calibrate_min_x, calibrate_max_x, 0, tftWidth());
+    return map(p.x, calibrate_min_x, calibrate_max_x, 0, tftWidth());
 }
 
 int touchGetY()
 {
-    return tftHeight() - map(p.x, calibrate_min_y, calibrate_max_y, 0, tftHeight());
+    return map(p.y, calibrate_min_y, calibrate_max_y, 0, tftHeight());
 }
 
 int touchGetZ()

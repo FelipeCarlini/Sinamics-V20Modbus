@@ -78,3 +78,4 @@ void runUI();
 void renderButton(ButtonClass Button, int color, short int textSize);
 int tftWidth();
 int tftHeight();
+void fillScreen(int bg_color);

@@ -1,4 +1,5 @@
 #include <user_interface.h>
+#include <sinamics_v20.h>
 #include <display.h>
 #include <Arduino.h>
 #include <SPI.h>
@@ -210,7 +211,11 @@ void runUI()
         }
     }
     if(shouldStop()){
-        //pass
+        stopMotor();
+    }
+    if(shouldCalibrateBtn()){
+        calibrate();
+        setCalibrationVlues();
     }
 }
 
@@ -254,7 +259,7 @@ void cleanEEPROM()
 
 void renderSelection()
 {
-    renderButton(SelectionBtn, BLUE);
+    renderButton(SelectionBtn, 47200);
     delay(300);
     tft.fillScreen(BLACK);
     renderBtnArray(ConfigArray, 2);
@@ -277,7 +282,7 @@ void renderBtnArray(ButtonClass ButtonArray[], int btnQty, short int textSize)
     {
         if (ButtonArray[x].selected == true)
         {
-            renderButton(ButtonArray[x], BLUE, textSize);
+            renderButton(ButtonArray[x], 47200, textSize);
         }
         else
         {
@@ -358,12 +363,17 @@ void renderText(int x0, short int y0, short int color, short int textSize, Strin
     tft.println(text);
 }
 
+void fillScreen(int bg_color)
+{
+    tft.fillScreen(BLACK);
+}
+
 void onSelectSelectionButton(ButtonClass ButtonArray[], int touchedBtn)
 {
     if (ButtonArray[touchedBtn].selected == false)
     {
         ButtonArray[touchedBtn].selected = true;
-        renderButton(ButtonArray[touchedBtn], BLUE);
+        renderButton(ButtonArray[touchedBtn], 47200);
     }
     for (int x = 0; x < 4; x++)
     {
@@ -432,7 +442,7 @@ int getBtnValue(ButtonClass button)
 
 void renderConfig(short int configBtn)
 {
-    renderButton(ConfigArray[configBtn], BLUE);
+    renderButton(ConfigArray[configBtn], 47200);
     delay(300);
     tft.fillScreen(BLACK);
     renderButton(SelectionBtn, BLACK);
@@ -539,6 +549,7 @@ void runRoutine(ButtonClass *SubmitBtn, int speed, int time)
     const int init_stop_delay_ms = 1000, render_delay_ms = 300;
     unsigned long render_time = 0;
     int run_time = 0;
+    bool march_normal=false, march_inverse=false;
     while (millis() < initial_time + time * 1000)
     {
         if (millis() > render_time + render_delay_ms)
@@ -551,7 +562,17 @@ void runRoutine(ButtonClass *SubmitBtn, int speed, int time)
             {
                 textDisplay = " " + textDisplay;
             }
-            renderText(240, SubmitBtn->y0string, WHITE, 2, textDisplay, bg_color);
+            renderText(240, SubmitBtn->y0string, WHITE, 2, textDisplay, bg_color);            
+        }
+        if (march_normal == false) {
+            marchMotor(speed);
+            march_normal = true;
+        }
+        if (march_inverse == false && march_normal == true) {
+            if (millis() > initial_time + (time * 1000) / 2){
+                marchMotor(-speed);
+                march_inverse = true;
+            } 
         }
         if (millis() > initial_time + init_stop_delay_ms)
         {
@@ -571,7 +592,7 @@ void runRoutine(ButtonClass *SubmitBtn, int speed, int time)
     }
     renderButton(*SubmitBtn, BLACK);
     renderSelectedValues(WHITE, 2, 240, SubmitBtn->y0string, BLACK);
-    delay(300);
+    stopMotor();
 }
 
 int tftWidth()

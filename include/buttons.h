@@ -6,3 +6,4 @@ void setupHardwareButtons();
 
 bool shouldStop();
 bool shouldStart();
+bool shouldCalibrateBtn();
